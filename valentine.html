@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Valentine — For You</title>
+  <meta name="theme-color" content="#ffb3c7" />
+
+  <style>
+    :root{
+      --bg1:#0b0b12;
+      --bg2:#160c18;
+      --card:#ffffff10;
+      --card2:#ffffff14;
+      --stroke:#ffffff2a;
+      --text:#f7f3f7;
+      --muted:#ffffffb3;
+      --pink:#ff6aa2;
+      --rose:#ffb3c7;
+      --gold:#ffd37a;
+      --shadow: 0 30px 90px rgba(0,0,0,.55);
+      --radius: 22px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 20% 10%, #ff7ab91e 0%, transparent 60%),
+        radial-gradient(1000px 700px at 80% 30%, #ffd37a12 0%, transparent 55%),
+        radial-gradient(900px 650px at 40% 95%, #8a7dff12 0%, transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+      -webkit-text-size-adjust: 100%;
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
+    }
+
+    /* Floating hearts */
+    .hearts{position:fixed; inset:0; pointer-events:none; overflow:hidden; opacity:.75}
+    .heart{
+      position:absolute; width:14px; height:14px;
+      transform: rotate(45deg);
+      background: radial-gradient(circle at 30% 30%, #fff8, transparent 60%),
+                 linear-gradient(135deg, #ff6aa2, #ffb3c7);
+      border-radius: 3px;
+      filter: drop-shadow(0 8px 14px rgba(255,106,162,.25));
+      animation: floatUp linear infinite;
+    }
+    .heart::before,.heart::after{content:""; position:absolute; width:14px; height:14px; background:inherit; border-radius:50%}
+    .heart::before{left:-7px; top:0}
+    .heart::after{left:0; top:-7px}
+    @keyframes floatUp{
+      from{ transform: translateY(18vh) rotate(45deg); opacity:0}
+      12%{opacity:1}
+      to{ transform: translateY(-120vh) rotate(45deg); opacity:0}
+    }
+
+    .wrap{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: calc(18px + var(--safe-top)) 14px calc(22px + var(--safe-bottom));
+      position:relative;
+      transition: filter .6s ease;
+    }
+    body.unlocked .wrap{
+      filter: blur(10px);
+    }
+
+    .card{
+      width:min(620px, 100%);
+      background: linear-gradient(180deg, var(--card), var(--card2));
+      border:1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+      position:relative;
+    }
+    .card::after{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(700px 280px at 30% 0%, #ffb3c71c, transparent 60%),
+                  radial-gradient(500px 280px at 100% 40%, #ffd37a14, transparent 65%);
+      pointer-events:none;
+    }
+
+    .contentPad{
+      padding:20px 18px 18px;
+      position:relative;
+      z-index:1;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .brand{display:flex; align-items:center; gap:10px}
+    .badge{
+      width:42px; height:42px; border-radius:14px;
+      background: linear-gradient(135deg, #ff6aa2, #ffd37a);
+      display:grid; place-items:center;
+      box-shadow: 0 18px 40px rgba(255,106,162,.25);
+      flex:0 0 auto;
+    }
+    .title h1{
+      margin:0;
+      font-size: clamp(20px, 5vw, 30px);
+      line-height:1.1;
+      letter-spacing:.2px;
+    }
+    .title p{margin:6px 0 0; color:var(--muted); font-size: 13px}
+
+    .photo{
+      border-radius: 18px;
+      border:1px solid var(--stroke);
+      overflow:hidden;
+      background: #00000025;
+      position:relative;
+      /* phù hợp ảnh 1200x1800 => tỷ lệ 2/3 (width/height) */
+      aspect-ratio: 2/3;
+      display:grid;
+      place-items:center;
+    }
+    .photo img{width:100%; height:100%; object-fit:cover; display:block; opacity:.98; transform: scale(1.02)}
+    .photo .overlay{position:absolute; inset:0; background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,.35)); pointer-events:none}
+    .photo .caption{
+      position:absolute; left:12px; bottom:10px;
+      font-size:12px; color:#ffffffd6;
+      padding:8px 10px; border-radius: 999px;
+      background: rgba(0,0,0,.32);
+      border:1px solid rgba(255,255,255,.16);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      max-width: calc(100% - 24px);
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+
+    .lockArea{
+      display:flex; flex-direction:column; gap:12px;
+      padding:14px;
+      border-radius: 18px;
+      border:1px dashed rgba(255,255,255,.22);
+      background: rgba(0,0,0,.18);
+    }
+    .hintRow{display:flex; align-items:center; justify-content:space-between; gap:10px; color:var(--muted); font-size: 13px}
+    .hintRow b{color:#fff; font-weight: 600}
+
+    .inputs{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+    }
+    @media (min-width: 720px){
+      .inputs{grid-template-columns: 1fr auto}
+    }
+
+    /* Mobile: cố định chiều cao thẻ để ảnh 2:3 vừa màn hình (iPhone/webview nhỏ) */
+    @media (max-width: 420px){
+      .wrap{padding: calc(12px + var(--safe-top)) 10px calc(12px + var(--safe-bottom));}
+      .card{
+        width:100%;
+        max-width:100%;
+        height: calc(100vh - (12px + var(--safe-top)) - (12px + var(--safe-bottom)));
+        border-radius: 14px;
+        display:flex;
+        flex-direction:column;
+      }
+      .contentPad{padding:12px; gap:10px; display:flex; flex-direction:column; height:100%; min-height:0}
+      .photo{
+        /* photo chiếm phần còn lại để vừa màn hình */
+        flex:1 1 auto;
+        width:100%;
+        aspect-ratio: 2/3;
+        min-height:0;
+        display:block;
+      }
+      .photo img{width:100%; height:100%; object-fit:cover; display:block}
+      .lockArea{flex:0 0 auto}
+      .footerNote{display:none}
+      .hearts{display:none}
+    }
+
+    .inputs input{
+      width:100%;
+      padding: 14px 14px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      outline:none;
+      font-size: 16px; /* iOS: tránh auto-zoom */
+      letter-spacing: 2px;
+      min-height: 48px;
+    }
+    .inputs input::placeholder{color:#ffffff99; letter-spacing: normal}
+
+    .btn{
+      padding: 14px 14px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.18);
+      background: linear-gradient(135deg, rgba(255,106,162,.95), rgba(255,211,122,.9));
+      color:#1b0a14;
+      font-weight: 900;
+      cursor:pointer;
+      transition: transform .08s ease, filter .2s ease;
+      user-select:none;
+      min-height: 48px;
+      width:100%;
+    }
+    @media (min-width: 720px){ .btn{width:auto} }
+    .btn:hover{filter: brightness(1.05)}
+    .btn:active{transform: translateY(1px) scale(.99)}
+
+    .msg{min-height: 18px; font-size: 13px; color:#ffffffcc}
+    .msg.error{color:#ffb3c7}
+    .msg.ok{color:#ffd37a}
+
+    .footerNote{
+      margin-top:2px;
+      font-size: 12px;
+      color:#ffffff9c;
+      text-align:center;
+      padding-top: 6px;
+    }
+
+    .shake{animation: shake .35s ease}
+    @keyframes shake{
+      0%,100%{transform: translateX(0)}
+      20%{transform: translateX(-7px)}
+      40%{transform: translateX(6px)}
+      60%{transform: translateX(-4px)}
+      80%{transform: translateX(3px)}
+    }
+
+    /* ===== Overlay letter (đè lên wrap) ===== */
+    .overlay-card{
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 22px 14px calc(22px + var(--safe-bottom));
+      background: rgba(10,10,16,.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .55s ease;
+    }
+    .overlay-card.show{
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .paperWrap{
+      width:min(720px, 100%);
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.16);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      transform: translateY(30px) scale(.97);
+      transition: transform .65s cubic-bezier(.2,.8,.2,1);
+    }
+    .overlay-card.show .paperWrap{
+      transform: translateY(0) scale(1);
+    }
+
+    .paper{
+      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.90));
+      color:#1a0f16;
+      border-radius: 16px;
+      padding: 18px 16px;
+      border: 1px solid rgba(0,0,0,.08);
+      box-shadow: 0 18px 40px rgba(0,0,0,.18);
+    }
+    .paper h2{margin:0 0 10px; font-size: 18px}
+    .paper .meta{font-size: 12px; color:#5a4b55; margin-bottom: 10px}
+    .paper .content{font-size: 14px; line-height: 1.7; color:#2b1c25; white-space: pre-wrap}
+    .paper .sign{margin-top: 14px; font-weight: 900; color:#24131d}
+
+    .overlayTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 10px;
+      flex-wrap:wrap;
+    }
+    .pill{
+      padding:8px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.16);
+      color: #ffffffd6;
+      font-size: 12px;
+      white-space:nowrap;
+    }
+    .closeBtn{
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      color:#fff;
+      cursor:pointer;
+      min-height: 44px;
+    }
+
+    button, input{touch-action: manipulation}
+  </style>
+</head>
+
+<body>
+  <div class="hearts" id="hearts"></div>
+
+  <!-- LOCK SCREEN -->
+  <main class="wrap">
+    <div class="card">
+      <div class="contentPad">
+        <div class="brand">
+          <div class="badge" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M12 21s-7-4.35-9.5-8.5C.8 9.4 2.1 6.6 4.9 5.8c1.7-.5 3.4.2 4.4 1.5C10.3 6 12 5 12 5s1.7 1 2.7 2.3c1-1.3 2.7-2 4.4-1.5 2.8.8 4.1 3.6 2.4 6.7C19 16.65 12 21 12 21Z" fill="white" opacity=".95"/>
+            </svg>
+          </div>
+          <div class="title">
+            <h1>Valentine</h1>
+            <p>Mở khóa bằng ngày đặc biệt 💗</p>
+          </div>
+        </div>
+
+        <div class="photo">
+          <!-- ✅ Thay ảnh photobooth: đổi src thành img/photo.jpg -->
+          <img id="photoImg" alt="Photobooth của tụi mình" src="img/photo.jpg" />
+          <div class="overlay"></div>
+          <div class="caption" id="cap">Hình của tụi mình</div>
+        </div>
+
+        <div class="lockArea" id="lockArea">
+          <div class="hintRow">
+            <span>Hint:</span>
+            <b>“Ngày đầu tiên yêu nhau”</b>
+          </div>
+
+          <div class="inputs">
+            <input
+              id="pass"
+              type="password"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              placeholder="Nhập mật khẩu…"
+              aria-label="Mật khẩu"
+            />
+            <button class="btn" id="unlockBtn">Mở khóa</button>
+          </div>
+
+          <div class="msg" id="msg"></div>
+        </div>
+
+        <div class="footerNote">Tip: pass là 8 số ngày tháng năm</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- LETTER OVERLAY (đè lên wrap) -->
+  <div class="overlay-card" id="letterOverlay" aria-hidden="true">
+    <div class="paperWrap" role="dialog" aria-modal="true" aria-label="Thư Valentine">
+      <div class="overlayTop">
+        <div class="pill">💌 Thư dành riêng cho cục zàng</div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+          <div class="pill" id="datePill"></div>
+          <button class="closeBtn" id="closeOverlayBtn">Đóng</button>
+        </div>
+      </div>
+
+      <div class="paper">
+        <h2>Gửi cục zàng,</h2>
+        <div class="meta" id="metaLine">Valentine đầu tiên 14/02/2026</div>
+        <div class="content" id="letterContent"></div>
+        <div class="sign" id="signLine">— (Tên của anh)</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== CONFIG =====
+    const PASSCODE = "02022026";
+
+    // ===== SLIDESHOW CONFIG =====
+    // Thêm tên file ảnh vào mảng này (thứ tự sẽ là thứ tự hiển thị)
+    // Ví dụ: "img/photo.jpg", "img/photo2.jpg", "img/photo3.jpg"
+    const IMAGES = [
+      "img/photo.jpg",
+      "img/photo2.jpg",
+      "img/photo3.jpg",
+      "img/photo4.jpg",
+      "img/photo5.jpg",
+      "img/photo6.jpg",
+      "img/photo7.jpg",
+    ];
+    const SLIDE_INTERVAL = 1000; // ms
+
+    // ✅ Điền nội dung thư ở đây (dùng <br> để xuống dòng cho đẹp)
+    const LETTER_HTML = `
+Năm đầu tiên có nhau mà không được gặp cục zàng, Bi nhớ cục zàng quá!
+Bi thấy hên vì một giây phút nào đó Địp hết ghét Bi để mình không bỏ lỡ nhau khi cả 2 đều có tình cảm.
+Bi thương Địp, Bi nhớ Địp lắm không để lạc Địp nữa đâu nên khi nào mình gặp za :)))
+Cảm ơn Địppppppppppp <br>
+Lớp vờ duuuu.
+    `.trim();
+
+    const SIGNATURE = "— Bi Đẹp Chai";
+
+    // ===== UI refs =====
+    const passInput = document.getElementById("pass");
+    const unlockBtn = document.getElementById("unlockBtn");
+    const msg = document.getElementById("msg");
+    const lockArea = document.getElementById("lockArea");
+    const cap = document.getElementById("cap");
+    const photoImg = document.getElementById("photoImg");
+
+    const letterOverlay = document.getElementById("letterOverlay");
+    const closeOverlayBtn = document.getElementById("closeOverlayBtn");
+    const letterContent = document.getElementById("letterContent");
+    const signLine = document.getElementById("signLine");
+    const datePill = document.getElementById("datePill");
+
+    // ===== Init content =====
+    letterContent.innerHTML = LETTER_HTML;
+    signLine.textContent = SIGNATURE;
+
+    const now = new Date();
+    const dd = String(now.getDate()).padStart(2,"0");
+    const mm = String(now.getMonth()+1).padStart(2,"0");
+    const yyyy = now.getFullYear();
+    datePill.textContent = `Hôm nay: 14/02/${yyyy}`;
+
+    // ===== Hearts =====
+    const hearts = document.getElementById("hearts");
+    function spawnHearts(){
+      const count = 12;
+      for(let i=0;i<count;i++){
+        const h = document.createElement("div");
+        h.className = "heart";
+        h.style.left = (Math.random()*100) + "vw";
+        h.style.animationDelay = (Math.random()*6) + "s";
+        h.style.animationDuration = (10 + Math.random()*10) + "s";
+        const size = 10 + Math.random()*10;
+        h.style.width = size + "px";
+        h.style.height = size + "px";
+        h.style.bottom = (-20 - Math.random()*30) + "vh";
+        hearts.appendChild(h);
+      }
+    }
+    spawnHearts();
+    setInterval(() => {
+      while(hearts.children.length > 40) hearts.removeChild(hearts.firstChild);
+      spawnHearts();
+    }, 3500);
+
+    function setMessage(text, type){
+      msg.textContent = text || "";
+      msg.classList.remove("error","ok");
+      if(type) msg.classList.add(type);
+    }
+    function shake(el){
+      el.classList.remove("shake");
+      void el.offsetWidth;
+      el.classList.add("shake");
+    }
+
+    // ===== Slideshow =====
+    let currentSlide = 0;
+    let slideTimer = null;
+
+    function preloadSlides(){
+      IMAGES.forEach(src => { const i = new Image(); i.src = src; });
+    }
+
+    function showSlide(index){
+      if(!IMAGES.length) return;
+      currentSlide = ((index % IMAGES.length) + IMAGES.length) % IMAGES.length;
+      const src = IMAGES[currentSlide];
+      photoImg.src = src;
+      cap.textContent = `${currentSlide+1}/${IMAGES.length}`;
+    }
+
+    function nextSlide(){ showSlide(currentSlide+1); }
+    function prevSlide(){ showSlide(currentSlide-1); }
+
+    function startSlideshow(){ stopSlideshow(); if(IMAGES.length>1) slideTimer = setInterval(nextSlide, SLIDE_INTERVAL); }
+    function stopSlideshow(){ if(slideTimer){ clearInterval(slideTimer); slideTimer = null; } }
+
+    // Tap image to advance (mobile-friendly)
+    photoImg.addEventListener('click', () => { nextSlide(); restartAutoplay(); });
+    photoImg.addEventListener('touchend', () => { nextSlide(); restartAutoplay(); });
+
+    function restartAutoplay(){ stopSlideshow(); startSlideshow(); }
+
+    // ===== Unlock logic =====
+    function openOverlay(){
+      // pause slideshow when opening the letter
+      stopSlideshow();
+      document.body.classList.add("unlocked");
+      letterOverlay.classList.add("show");
+      letterOverlay.setAttribute("aria-hidden","false");
+      closeOverlayBtn.focus();
+      // tăng hearts một chút cho "wow"
+      for(let i=0;i<16;i++) spawnHearts();
+    }
+
+    function closeOverlay(){
+      letterOverlay.classList.remove("show");
+      letterOverlay.setAttribute("aria-hidden","true");
+      document.body.classList.remove("unlocked");
+      passInput.focus();
+      // resume slideshow when closing
+      startSlideshow();
+    }
+
+    function unlock(){
+      const v = (passInput.value || "").trim();
+      if(v === PASSCODE){
+        setMessage("Mở khóa thành công 💗", "ok");
+        openOverlay();
+      } else {
+        setMessage("Sai pass rồi… thử lại nha 🥺", "error");
+        shake(lockArea);
+        passInput.focus();
+        passInput.select();
+      }
+    }
+
+    // init slideshow
+    preloadSlides();
+    showSlide(0);
+    startSlideshow();
+
+    // events
+    unlockBtn.addEventListener("click", unlock);
+    passInput.addEventListener("keydown", (e) => { if(e.key === "Enter") unlock(); });
+
+    // Close overlay interactions
+    closeOverlayBtn.addEventListener("click", closeOverlay);
+    letterOverlay.addEventListener("click", (e) => {
+      if(e.target === letterOverlay) closeOverlay();
+    });
+    window.addEventListener("keydown", (e) => {
+      if(e.key === "Escape" && letterOverlay.classList.contains("show")) closeOverlay();
+    });
+  </script>
+</body>
+</html>
